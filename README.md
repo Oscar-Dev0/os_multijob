@@ -12,6 +12,7 @@ A simple lb-phone application to manage the native [qbx_core](https://github.com
 - [Discord](https://discord.gg/TZFBBHvG6E)
 
 # Credits
+- [Oscar Dev](https://github.com/Oscar-Dev0) for edits and maintenance (2026)
 - [Randolio](https://github.com/Randolio/randol_multijob) for the multijob natives
 - [LB-Phone](https://github.com/lbphone/lb-phone-app-template) for the template apps
 - [FuZZED105](https://github.com/FuZZED105/fzd_multijob) for the original app
@@ -23,7 +24,7 @@ A simple lb-phone application to manage the native [qbx_core](https://github.com
 
 # Copyright
 
-Copyright © 2024 Solareon <https://github.com/solareon>
+Copyright © 2026 Oscar Dev <https://github.com/Oscar-Dev0>
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
