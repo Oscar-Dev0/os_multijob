@@ -1,0 +1,47 @@
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   LAYOUT: centered
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+#app[data-style="centered"] {
+  --accent: #2dd4bf;
+  --accent-dim: #0f9f8c;
+  --accent-glow: rgba(45, 212, 191, 0.25);
+  --accent-subtle: rgba(45, 212, 191, 0.1);
+  --panel-border: rgba(45, 212, 191, 0.12);
+
+  justify-content: center;
+  align-items: center;
+  padding: 28px;
+}
+#app[data-style="centered"] #panel {
+  width: min(520px, 92vw);
+  max-height: min(85vh, 760px);
+  animation: riseIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+#app[data-style="centered"] #backdrop {
+  background:
+    radial-gradient(1200px 600px at 20% 10%, rgba(45, 212, 191, 0.12), transparent 60%),
+    rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(6px);
+  animation: fadeIn 0.25s ease both;
+}
+
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 520px) {
+  #app[data-style="centered"] {
+    padding: 14px;
+  }
+  #app[data-style="centered"] #panel {
+    width: 100%;
+    max-height: 90vh;
+  }
+}
+
+@media (max-height: 600px) {
+  #app[data-style="centered"] #panel {
+    max-height: 88vh;
+  }
+}

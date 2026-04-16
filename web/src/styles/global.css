@@ -1,0 +1,534 @@
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   OS Multijob — Standalone NUI
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+:root {
+  /* ── Palette ── */
+  --bg: #060b16;
+  --surface: rgba(8, 14, 28, 0.88);
+  --glass: rgba(12, 20, 40, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --glass-strong: rgba(255, 255, 255, 0.08);
+  --accent: #3b9eff;
+  --accent-dim: #1a6fd4;
+  --accent-glow: rgba(59, 158, 255, 0.25);
+  --accent-subtle: rgba(59, 158, 255, 0.08);
+  --text: #eaf2ff;
+  --text-secondary: #8da4c4;
+  --muted: #5a7194;
+  --danger: #ff4d6a;
+  --danger-bg: rgba(255, 77, 106, 0.1);
+  --danger-border: rgba(255, 77, 106, 0.25);
+  --success: #34d399;
+  --success-bg: rgba(52, 211, 153, 0.1);
+
+  /* ── Background ── */
+  --bg-image: url('https://r2.fivemanage.com/33fr3q2DK4d0AbAWpXnzg/fivem/nuis_interface.png');
+  --bg-fallback: linear-gradient(160deg, #070e1c, #0b1628, #060b16);
+  --bg-brightness: 0.55;
+  --bg-overlay-opacity: 0.65;
+
+  /* ── Cards ── */
+  --card-bg: rgba(10, 18, 36, 0.65);
+  --card-border: rgba(59, 158, 255, 0.1);
+  --card-radius: 14px;
+
+  /* ── Active card ── */
+  --active-bg: rgba(12, 24, 50, 0.72);
+  --active-border: rgba(59, 158, 255, 0.3);
+
+  /* ── Buttons ── */
+  --btn-radius: 10px;
+
+  /* ── Typography ── */
+  --font: 'Sora', 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* ── Panel ── */
+  --panel-radius: 20px;
+  --panel-border: rgba(59, 158, 255, 0.08);
+  --panel-shadow:
+    0 0 0 1px rgba(59, 158, 255, 0.1),
+    0 32px 80px rgba(0, 0, 0, 0.55),
+    0 0 60px rgba(59, 158, 255, 0.06);
+
+  /* ── Scrollbar ── */
+  --scrollbar-w: 4px;
+}
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  font-family: var(--font);
+  color: var(--text);
+  background: transparent;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar { width: var(--scrollbar-w); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--accent), var(--accent-dim));
+  border-radius: 10px;
+}
+::-webkit-scrollbar-track { background: transparent; }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   #app — hidden by default
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+#app {
+  position: fixed;
+  inset: 0;
+  display: none;
+  z-index: 9999;
+}
+#app.active { display: flex; }
+
+/* ── Backdrop ── */
+#backdrop {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  z-index: 0;
+  cursor: pointer;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   Panel
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+#panel {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--panel-border);
+  box-shadow: var(--panel-shadow);
+  border-radius: var(--panel-radius);
+  overflow: hidden;
+  animation: panelIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+}
+
+@keyframes panelIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Background image layer */
+#panel::before {
+  content: "";
+  position: absolute;
+  inset: -16px;
+  background: var(--bg-fallback);
+  background-image: var(--bg-image);
+  background-size: cover;
+  background-position: center;
+  filter: brightness(var(--bg-brightness)) blur(1px);
+  transform: scale(1.08);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Overlay gradient */
+#panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 10% 0%, rgba(59, 158, 255, 0.1), transparent 50%),
+    radial-gradient(ellipse at 90% 100%, rgba(26, 111, 212, 0.06), transparent 40%),
+    linear-gradient(170deg, rgba(6, 11, 22, var(--bg-overlay-opacity)), rgba(6, 11, 22, 0.35));
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Header ── */
+.panel-header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 26px 0;
+  margin-bottom: 6px;
+}
+
+.header-text h1 {
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #fff 30%, var(--text-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header-text p {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+#close-btn {
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  backdrop-filter: blur(8px);
+}
+#close-btn:hover {
+  background: rgba(255, 77, 106, 0.12);
+  border-color: rgba(255, 77, 106, 0.25);
+  color: var(--danger);
+  transform: rotate(90deg);
+}
+
+/* ── Content ── */
+.panel-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 26px 26px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   Section labels
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--muted);
+  font-weight: 700;
+  margin-top: 4px;
+}
+.section-label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--glass-border), transparent);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   Active job card
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.active-section { display: contents; }
+
+.active-card {
+  position: relative;
+  background: var(--active-bg);
+  border: 1px solid var(--active-border);
+  border-radius: var(--card-radius);
+  padding: 18px 20px;
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.active-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.6;
+}
+.active-card:hover {
+  border-color: rgba(59, 158, 255, 0.45);
+  transform: translateY(-1px);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   Job card
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.job-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  padding: 16px 20px;
+  backdrop-filter: blur(8px);
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  animation: cardIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+.job-card:hover {
+  border-color: rgba(59, 158, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3), 0 0 20px rgba(59, 158, 255, 0.06);
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   Job info (shared)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.job-info {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 2px;
+}
+
+.job-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.job-desc {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+/* ── Status badge ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 20px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.badge-active {
+  background: var(--accent-subtle);
+  color: var(--accent);
+  border: 1px solid rgba(59, 158, 255, 0.2);
+}
+.badge-duty {
+  background: var(--success-bg);
+  color: var(--success);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+}
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   Buttons
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--btn-radius);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  letter-spacing: 0.02em;
+  transition: all 0.18s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Primary actions */
+.btn-duty, .btn-select {
+  margin-top: 12px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dim));
+  color: #fff;
+  box-shadow: 0 8px 24px var(--accent-glow);
+}
+.btn-duty:hover, .btn-select:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 32px var(--accent-glow), 0 0 16px rgba(59, 158, 255, 0.15);
+  filter: brightness(1.12);
+}
+.btn-duty:active, .btn-select:active {
+  transform: translateY(0);
+  filter: brightness(0.95);
+}
+
+/* Danger */
+.btn-danger {
+  margin-top: 6px;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--glass-border);
+  box-shadow: none;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 8px 12px;
+}
+.btn-danger:hover {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border-color: var(--danger-border);
+}
+
+.active-actions, .card-actions {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Empty ── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 3rem 1rem;
+  text-align: center;
+}
+.empty-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   Popup
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+.popup {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+.popup-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+.popup-card {
+  position: relative;
+  z-index: 1;
+  background: var(--surface);
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
+  padding: 28px 28px 24px;
+  max-width: 360px;
+  width: 90%;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.5), 0 0 50px rgba(59, 158, 255, 0.06);
+  backdrop-filter: blur(20px) saturate(1.3);
+  animation: popupIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes popupIn {
+  from { opacity: 0; transform: scale(0.92) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.popup-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+.popup-icon svg {
+  width: 22px;
+  height: 22px;
+  color: var(--danger);
+}
+
+.popup-card h3 {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 6px;
+  letter-spacing: -0.01em;
+}
+.popup-card p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+  line-height: 1.45;
+}
+.popup-btns {
+  display: flex;
+  gap: 8px;
+}
+.btn-cancel {
+  flex: 1;
+  background: var(--glass);
+  color: var(--text-secondary);
+  border: 1px solid var(--glass-border);
+}
+.btn-cancel:hover {
+  background: var(--glass-strong);
+  color: var(--text);
+}
+.btn-confirm {
+  flex: 1;
+  background: linear-gradient(135deg, var(--danger), #d42040);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(255, 77, 106, 0.2);
+}
+.btn-confirm:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   Layouts → imported from styles/layouts/
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */

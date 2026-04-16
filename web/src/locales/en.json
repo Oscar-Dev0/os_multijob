@@ -1,0 +1,17 @@
+{
+  "app_title": "Jobs",
+  "app_subtitle": "Manage roles, toggle duty and clear slots.",
+  "enter_duty": "Go on duty",
+  "exit_duty": "Go off duty",
+  "select_job": "Select",
+  "remove_job": "Remove",
+  "popup_remove_title": "Remove job",
+  "popup_remove_desc": "Remove %s from your list?",
+  "popup_cancel": "Cancel",
+  "popup_confirm": "Confirm",
+  "active_label": "CURRENT JOB",
+  "other_label": "OTHER JOBS",
+  "no_jobs": "You don't have other jobs",
+  "civilian": "Civilian",
+  "civilian_desc": "Rank: Civilian [0] <br /> Salary: $0"
+}
