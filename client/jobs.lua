@@ -102,7 +102,7 @@ local function assignJob(citizenid, job, grade)
         citizenid = citizenid,
         job = job,
         grade = grade,
-    })
+    }) 
 end
 
 RegisterNetEvent('multijob:client:assignJob', function(citizenid, job, grade)
