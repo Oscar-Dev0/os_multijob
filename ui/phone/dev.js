@@ -2,6 +2,11 @@
 
 window.addEventListener("load", () => {
     if (window.invokeNative) {
+        const components = document.createElement("script");
+        components.src = "https://cfx-nui-lb-phone/ui/components.js";
+        document.head.appendChild(components);
+        document.documentElement.style.visibility = "visible";
+        document.body.style.visibility = "visible";
         const phoneWrapper = document.getElementById("phone-wrapper");
         const app = phoneWrapper.querySelector(".app");
         phoneWrapper.parentNode.insertBefore(app, phoneWrapper);

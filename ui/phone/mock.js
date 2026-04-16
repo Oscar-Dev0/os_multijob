@@ -6,6 +6,44 @@
 const isEnvBrowser = () => !(window).invokeNative;
 
 if (isEnvBrowser()) {
+    // ── Locales mock ──
+    window.MOCK_LOCALES = {
+        es: {
+            app_title: 'Empleos',
+            app_subtitle: 'Gestiona roles, cambia servicio y limpia slots.',
+            enter_duty: 'Entrar de servicio',
+            exit_duty: 'Salir de servicio',
+            select_job: 'Seleccionar',
+            remove_job: 'Eliminar',
+            popup_remove_title: 'Eliminar trabajo',
+            popup_remove_desc: '¿Eliminar %s de tu lista?',
+            popup_cancel: 'Cancelar',
+            popup_confirm: 'Confirmar',
+            active_label: 'TRABAJO ACTUAL',
+            other_label: 'OTROS TRABAJOS',
+            no_jobs: 'No tienes otros trabajos',
+            civilian: 'Civil',
+            civilian_desc: 'Rango: Civil [0] <br /> Salario: $0'
+        },
+        en: {
+            app_title: 'Jobs',
+            app_subtitle: 'Manage roles, toggle duty and clear slots.',
+            enter_duty: 'Go on duty',
+            exit_duty: 'Go off duty',
+            select_job: 'Select',
+            remove_job: 'Remove',
+            popup_remove_title: 'Remove job',
+            popup_remove_desc: 'Remove %s from your list?',
+            popup_cancel: 'Cancel',
+            popup_confirm: 'Confirm',
+            active_label: 'CURRENT JOB',
+            other_label: 'OTHER JOBS',
+            no_jobs: "You don't have other jobs",
+            civilian: 'Civilian',
+            civilian_desc: 'Rank: Civilian [0] <br /> Salary: $0'
+        }
+    };
+
     // ── Datos mock ──
     const mockJobs = [
         {

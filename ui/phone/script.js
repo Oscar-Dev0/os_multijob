@@ -1,58 +1,64 @@
 // ── Locale system ──
-const LOCALES = {
-    es: {
-        app_title: "Empleos",
-        app_subtitle: "Gestiona roles, cambia servicio y limpia slots.",
-        enter_duty: "Entrar de servicio",
-        exit_duty: "Salir de servicio",
-        select_job: "Seleccionar",
-        remove_job: "Eliminar trabajo",
-        popup_remove_title: "Eliminar trabajo",
-        popup_remove_desc: "Quitar %s",
-        popup_cancel: "Cancelar",
-        popup_confirm: "Confirmar",
-        civilian: "Civil",
-        civilian_desc: "Rango: Civil [0] <br /> Salario: $0"
-    },
-    en: {
-        app_title: "Jobs",
-        app_subtitle: "Manage roles, toggle duty and clear slots.",
-        enter_duty: "Go on duty",
-        exit_duty: "Go off duty",
-        select_job: "Select",
-        remove_job: "Remove job",
-        popup_remove_title: "Remove job",
-        popup_remove_desc: "Remove %s",
-        popup_cancel: "Cancel",
-        popup_confirm: "Confirm",
-        civilian: "Civilian",
-        civilian_desc: "Rank: Civilian [0] <br /> Salary: $0"
-    }
-};
+let LOCALES = {};
+let i18n = {};
 
-let i18n = LOCALES.es;
+async function loadLocales() {
+  try {
+    const res = await fetch('../locales/es.json');
+    LOCALES.es = await res.json();
+  } catch { LOCALES.es = {}; }
+  try {
+    const res = await fetch('../locales/en.json');
+    LOCALES.en = await res.json();
+  } catch { LOCALES.en = {}; }
+    if ((!LOCALES.es || !Object.keys(LOCALES.es).length) && window.MOCK_LOCALES?.es) {
+        LOCALES.es = window.MOCK_LOCALES.es;
+    }
+    if ((!LOCALES.en || !Object.keys(LOCALES.en).length) && window.MOCK_LOCALES?.en) {
+        LOCALES.en = window.MOCK_LOCALES.en;
+    }
+  i18n = LOCALES.es;
+}
 
 function setLocale(lang) {
-    i18n = LOCALES[lang] || LOCALES.es;
-    applyI18n();
+  i18n = LOCALES[lang] || LOCALES.es || {};
+  applyI18n();
 }
 
 function t(key, ...args) {
-    let str = i18n[key] || key;
-    if (args.length) {
-        args.forEach(arg => {
-            str = str.replace('%s', arg);
-        });
-    }
-    return str;
+  let str = i18n[key] || key;
+  for (const a of args) str = str.replace('%s', a);
+  return str;
 }
 
 function applyI18n() {
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        el.textContent = t(key);
-    });
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.textContent = t(el.getAttribute('data-i18n'));
+  });
 }
+
+// ── NUI fetch ──
+const RES = (typeof GetParentResourceName === 'function')
+  ? GetParentResourceName()
+  : 'os_multijob';
+
+async function realFetchNui(event, data) {
+  try {
+    const resp = await fetch('https://' + RES + '/' + event, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+      body: JSON.stringify(data || {}),
+    });
+    return await resp.json();
+  } catch {
+    return null;
+  }
+}
+
+const nuiFetch = (typeof window.fetchNui === 'function')
+    ? window.fetchNui
+        : realFetchNui;
+
 
 // ── Job rendering ──
 async function addJob(info) {
@@ -129,21 +135,22 @@ async function loadJobs(jobs) {
 };
 
 // ── Init ──
-window.addEventListener("load", () => {
-    fetchNui('getLocale', {}).then(data => {
+window.addEventListener("load", async () => {
+    await loadLocales();
+    nuiFetch('getLocale', {}).then(data => {
         const lang = (data && data.locale) || 'es';
         setLocale(lang);
-        fetchNui('getJobs', {}).then(loadJobs);
+        nuiFetch('getJobs', {}).then(loadJobs);
     });
 
     $("body").on("click", ".activeJob-status", function(e) {
         e.preventDefault();
-        fetchNui('toggleDuty', {});
+        nuiFetch('toggleDuty', {});
     });
 
     $("body").on("click", ".job-status", function(e) {
         e.preventDefault();
-        fetchNui('changeJob', this.dataset.job);
+        nuiFetch('changeJob', this.dataset.job);
     });
 
     $("body").on("click", ".job-remove", function(e) {
@@ -160,7 +167,7 @@ window.addEventListener("load", () => {
                     title: t('popup_confirm'),
                     color: "green",
                     cb: () => {
-                        fetchNui('removeJob', this.dataset.job);
+                        nuiFetch('removeJob', this.dataset.job);
                         $(this).parent().fadeOut();
                     }
                 }
@@ -171,6 +178,6 @@ window.addEventListener("load", () => {
 
 window.addEventListener("message", (event) => {
     if(event.data.action == "update-jobs") {
-        fetchNui('getJobs', {}).then(loadJobs);
+        nuiFetch('getJobs', {}).then(loadJobs);
     };
 });
