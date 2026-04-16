@@ -1,5 +1,4 @@
-local sendPhoneMessage = MJClient.sendPhoneMessage
-local APP_ID = MJClient.APP_ID
+local sendMessage = MJClient.sendMessage
 
 local function buildJobMenu(playerJobs, primaryJob, sharedJobs)
     local jobMenu = {}
@@ -63,20 +62,20 @@ RegisterNUICallback('toggleDuty', function(_, cb)
     Bridge.ToggleDuty()
     cb(true)
     Wait(500)
-    sendPhoneMessage({ action = 'update-jobs' })
+    sendMessage({ action = 'update-jobs' })
 end)
 
 RegisterNUICallback('removeJob', function(job, cb)
     lib.callback('multijob:server:deleteJob', false, function()
         cb(true)
-        sendPhoneMessage({ action = 'update-jobs' })
+        sendMessage({ action = 'update-jobs' })
     end, job)
 end)
 
 RegisterNUICallback('changeJob', function(job, cb)
     lib.callback('multijob:server:changeJob', false, function()
         cb(true)
-        sendPhoneMessage({ action = 'update-jobs' })
+        sendMessage({ action = 'update-jobs' })
     end, job)
 end)
 
@@ -119,5 +118,5 @@ RegisterNUICallback('asignjob', function(data, cb)
 end)
 
 Bridge.onJobUpdate = function()
-    sendPhoneMessage({ action = 'update-jobs' })
+    sendMessage({ action = 'update-jobs' })
 end

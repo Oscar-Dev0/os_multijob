@@ -1,40 +1,58 @@
 local APP_ID = MJClient.APP_ID
-local PHONE_RESOURCE = MJClient.PHONE_RESOURCE
 
+-------------------------------------------------
+-- Phone handler table (phone/*.lua populates this)
+-------------------------------------------------
+Phone = {}
+
+-------------------------------------------------
+-- Mensajería
+-------------------------------------------------
 local function sendPhoneMessage(payload)
-    exports[PHONE_RESOURCE]:SendCustomAppMessage(APP_ID, payload)
+    if MJClient.HAS_PHONE and Phone.sendMessage then
+        Phone.sendMessage(payload)
+    end
 end
 
+local function sendStandaloneMessage(payload)
+    if MJClient.STANDALONE then
+        SendNUIMessage(payload)
+    end
+end
+
+local function sendMessage(payload)
+    sendPhoneMessage(payload)
+    sendStandaloneMessage(payload)
+end
+
+-------------------------------------------------
+-- Registro de app en teléfono (delegado a phone/*.lua)
+-------------------------------------------------
 local function addPhoneApp()
-    local added, errorMessage = exports[PHONE_RESOURCE]:AddCustomApp({
-        identifier = APP_ID,
-        name       = MJClient.APP_NAME,
-        description = MJClient.APP_DESC,
-        defaultApp = MJClient.APP_DEFAULT,
-        developer  = MJClient.APP_DEVELOPER,
-        ui         = MJClient.APP_UI,
-        icon       = MJClient.APP_ICON,
-    })
-
-    if not added then
-        lib.print.error(('[multijob] No se pudo registrar la app en el teléfono: %s'):format(tostring(errorMessage)))
-    elseif Config.Debug then
-        lib.print.info(('[multijob] App registrada — id: %s | ui: %s | icon: %s'):format(APP_ID, MJClient.APP_UI, MJClient.APP_ICON))
+    if not MJClient.HAS_PHONE then return end
+    if not Phone.createApp then
+        lib.print.error('[multijob] No hay handler de teléfono cargado para: ' .. tostring(MJClient.PHONE_TYPE))
+        return
     end
+    Phone.createApp()
 end
 
-CreateThread(function()
-    while GetResourceState(PHONE_RESOURCE) ~= 'started' do
-        Wait(500)
-    end
-    addPhoneApp()
-end)
-
-AddEventHandler('onResourceStart', function(resource)
-    if resource == PHONE_RESOURCE then
+if MJClient.HAS_PHONE then
+    CreateThread(function()
+        while GetResourceState(MJClient.PHONE_RESOURCE) ~= 'started' do
+            Wait(500)
+        end
         addPhoneApp()
-    end
-end)
+    end)
+
+    AddEventHandler('onResourceStart', function(resource)
+        if resource == MJClient.PHONE_RESOURCE then
+            addPhoneApp()
+        end
+    end)
+end
 
 MJClient.sendPhoneMessage = sendPhoneMessage
+MJClient.sendStandaloneMessage = sendStandaloneMessage
+MJClient.sendMessage = sendMessage
 MJClient.addPhoneApp = addPhoneApp

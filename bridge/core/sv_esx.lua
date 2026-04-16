@@ -93,3 +93,41 @@ function Bridge.GetSharedJob(jobName)
         grades = grades,
     }
 end
+
+-------------------------------------------------
+-- Auto-registrar job al cambiar (esx:setJob)
+-------------------------------------------------
+AddEventHandler('esx:setJob', function(src, job, lastJob)
+    if not Config.AutoRegisterOnJobChange then return end
+    if not job or not job.name then return end
+
+    local jobName = job.name
+    if Config.IgnoredJobs[jobName] then return end
+
+    local player = ESX.GetPlayerFromId(src)
+    if not player then return end
+
+    local identifier = player.identifier
+    if not identifier then return end
+
+    local jobGrade = job.grade or 0
+
+    local jobs = Bridge.GetPlayerJobs(identifier)
+    local count = 0
+    for _ in pairs(jobs) do count = count + 1 end
+
+    local maxJobs = Config.MaxJobs or 3
+    local group = player.getGroup()
+    if group == 'admin' or group == 'superadmin' then
+        maxJobs = math.huge
+    end
+
+    if count >= maxJobs and not jobs[jobName] then return end
+
+    if not jobs[jobName] or jobs[jobName] ~= jobGrade then
+        Bridge.AddPlayerToJob(identifier, jobName, jobGrade)
+        if Config.Debug then
+            lib.print.info(('[multijob] Auto-registrado job "%s" grade %s para %s'):format(jobName, jobGrade, identifier))
+        end
+    end
+end)
