@@ -94,10 +94,7 @@ local function assignJob(citizenid, job, grade)
 
     local gradeData = grade and jobInfo.grades and jobInfo.grades[grade]
     if not gradeData then
-        for g in pairs(jobInfo.grades) do
-            grade = g
-            break
-        end
+        grade = jobInfo.grades and next(jobInfo.grades) or grade
         if Config.Debug then lib.print.info(('[multijob] job "%s" sin grade específico, se usa grade %s'):format(tostring(job), tostring(grade))) end
     end
 

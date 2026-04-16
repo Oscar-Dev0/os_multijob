@@ -6,7 +6,7 @@ lua54 'yes'
 title 'Os Multijobs'
 description 'Multijob application for LB-Phone (QBX/QB/ESX)'
 author 'Oscar Dev.'
-version '3.0.1'
+version '3.0.2'
 
 shared_scripts {
     '@ox_lib/init.lua',

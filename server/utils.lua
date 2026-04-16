@@ -1,5 +1,3 @@
-local ADMIN_PERMISSION = MJServer.ADMIN_PERMISSION
-
 local function notify(src, msg, msgType)
     Bridge.Notify(src, msg, msgType)
 end

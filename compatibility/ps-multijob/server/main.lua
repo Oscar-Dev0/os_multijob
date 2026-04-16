@@ -5,9 +5,6 @@ if not Config.Compatibility or not Config.Compatibility['ps-multijob'] then retu
 -- exports['ps-multijob']:GetJobs(...) etc.
 -------------------------------------------------
 
-local ensureJob = MJServer.ensureJob
-local notify = MJServer.notify
-
 local function RegisterPSExport(name, cb)
     AddEventHandler(('__cfx_export_ps-multijob_%s'):format(name), function(setCB)
         setCB(cb)

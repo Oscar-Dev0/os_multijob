@@ -1,5 +1,3 @@
-local APP_ID = MJClient.APP_ID
-
 -------------------------------------------------
 -- Phone handler table (phone/*.lua populates this)
 -------------------------------------------------

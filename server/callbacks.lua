@@ -41,10 +41,7 @@ lib.callback.register('multijob:server:asignjob', function(source, data)
 
     local grade = data.grade
     if grade == nil then
-        for g in pairs(jobInfo.grades) do
-            grade = g
-            break
-        end
+        grade = jobInfo.grades and next(jobInfo.grades) or grade
     end
 
     Bridge.AddPlayerToJob(data.citizenid, data.job, grade)
