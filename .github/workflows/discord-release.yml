@@ -1,0 +1,22 @@
+name: "Discord Release Notification"
+
+on:
+    release:
+      types: [published]
+jobs:
+  github-releases-to-discord:
+    name: Discord Releases Changelog
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+    - name: Github Releases To Discord
+      uses: SethCohen/github-releases-to-discord@v1.15.0
+      with:
+        webhook_url: ${{ secrets.WEBHOOK_URL }}
+        color: "16736808"
+        username: ${{ github.event.repository.name }}
+        avatar_url: "https://avatars.githubusercontent.com/u/72371862?s=400&u=0c44c79751f939fc08d847267bb4d16a09acebe4&v=4"
+        footer_timestamp: true
+        footer_title: "Oscar Dev"
+        footer_icon_url: "https://avatars.githubusercontent.com/u/72371862?s=400&u=0c44c79751f939fc08d847267bb4d16a09acebe4&v=4"
