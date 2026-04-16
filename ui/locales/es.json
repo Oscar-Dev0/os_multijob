@@ -1,0 +1,14 @@
+{
+    "app_title": "Empleos",
+    "app_subtitle": "Gestiona roles, cambia servicio y limpia slots.",
+    "enter_duty": "Entrar de servicio",
+    "exit_duty": "Salir de servicio",
+    "select_job": "Seleccionar",
+    "remove_job": "Eliminar trabajo",
+    "popup_remove_title": "Eliminar trabajo",
+    "popup_remove_desc": "Quitar %s",
+    "popup_cancel": "Cancelar",
+    "popup_confirm": "Confirmar",
+    "civilian": "Civil",
+    "civilian_desc": "Rango: Civil [0] <br /> Salario: $0"
+}

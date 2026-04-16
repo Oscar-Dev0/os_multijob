@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>MultiJob</title>
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="styles.css" />
+
+        <script>
+            // Expose the resource name globally so lb-phone components can build the NUI URL
+            window.resourceName = "multijob";
+        </script>
+    </head>
+    <body>
+        <div id="phone-wrapper">
+            <div class="app">
+                <div class="app-header">
+                    <div>
+                        <div class="app-header-name" data-i18n="app_title"></div>
+                        <div class="app-header-subtitle" data-i18n="app_subtitle"></div>
+                    </div>
+                </div>
+
+                <div class="app-content">
+                    <div id="jobs"><div id="activeJob-card"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <script src="nui://game/ui/jquery.js" type="text/javascript"></script>
+        <script>
+            // Fallback jQuery para navegador (fuera de FiveM)
+            if (!window.jQuery) {
+                var s = document.createElement('script');
+                s.src = 'https://code.jquery.com/jquery-3.7.1.min.js';
+                s.onload = function() { console.log('[mock] jQuery cargado via CDN'); };
+                document.head.appendChild(s);
+            }
+        </script>
+        <script src="https://cfx-nui-lb-phone/ui/components.js"></script>
+        <script src="dev.js"></script>
+        <script src="mock.js"></script>
+        <script src="script.js"></script>
+    </body>
+</html>
